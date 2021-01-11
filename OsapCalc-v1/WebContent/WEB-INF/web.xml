@@ -29,4 +29,12 @@
 	<error-page>
 		<exception-type>javax.servlet.ServletException</exception-type>
 		<location>/res/myException.jsp</location>
-	</error-page></web-app>
+	</error-page>
+	
+	<context-param>
+		<param-name>period</param-name>
+		<param-value>120</param-value>
+	</context-param><context-param>
+		<param-name>interest</param-name>
+		<param-value>10</param-value>
+	</context-param></web-app>
