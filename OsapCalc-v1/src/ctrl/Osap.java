@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class Osap
@@ -34,8 +35,8 @@ public class Osap extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //		taskC(request, response);
-		taskD(request, response);
-//		taskE(request, response);
+//		taskD(request, response);
+		taskE(request, response);
 		
 	}
 	
@@ -70,7 +71,40 @@ public class Osap extends HttpServlet {
 		String strRequestURI = "Request URI: " + requestURI + "\n";
 		String strRequestServletPath = "Reuqest Servlet Path: " + requestServletPath + "\n";
 		
+		String rawPrincipal = request.getParameter("principal");
+		String rawPeriod = request.getParameter("period");
+		String rawInterest = request.getParameter("interest");
 		
+		//--------------------------------------------//
+		
+		ServletContext context = this.getServletContext();
+		
+		String applicantName = context.getInitParameter("applicantName");
+		String applicationName = context.getInitParameter("applicationName");
+		
+		String strApplicationName = "Application Name=" + applicationName + "\n";
+		String strContextPath = "Context Path=" + context.getContextPath() + "\n";
+		String strRealPath = "Real Path of Osap\nservlet=" + context.getRealPath("Osap") + "\n";
+		String strApplicantName = "Applicant Name=" + applicantName + "\n";
+		
+		Double principal = Double.parseDouble(context.getInitParameter("principal"));
+		Double period = Double.parseDouble(context.getInitParameter("period"));
+		Double interest = Double.parseDouble(context.getInitParameter("interest"));
+		
+		if (rawPrincipal != null) {principal = Double.parseDouble(rawPrincipal);}
+		if (rawPeriod != null) {period = Double.parseDouble(rawPeriod);}
+		if (rawInterest != null) {interest = Double.parseDouble(rawInterest) / 100;}
+		
+		Double monthlyPayments = ((interest/12.0)*principal)/(1 - Math.pow((1 + (interest/12.0)), -period));
+		
+		String strPrincipal = String.format("Principal=%.01f", principal);
+		String strPeriod = String.format("Period=%.01f", period);
+		String strInterest = String.format("Interest=%.01f", interest);
+		
+		String strBasedOn = "Based on " + strPrincipal + " " + strPeriod + " " + strInterest + "\n";
+		String strMonthlyPayments = "Monthly payments: " + String.format("%.01f", monthlyPayments) + "\n";
+		
+		// ------------------------------------//
 		response.setContentType("text/plain");
 		Writer resOut = response.getWriter();
 		resOut.write(helloWorld);
@@ -86,48 +120,55 @@ public class Osap extends HttpServlet {
 		resOut.write(strRequestURI);
 		resOut.write(strRequestServletPath);
 		
-		resOut.write("---- Application info ----\n");
+		// if user entered all the params
+		if (rawPrincipal != null && rawPeriod != null && rawInterest != null) {
+			resOut.write("---- Info from context object ----\n");
+			
+			resOut.write(strApplicationName);
+			resOut.write(strContextPath);
+			resOut.write(strRealPath);
+			resOut.write(strApplicantName);
+			
+			resOut.write("---- Monthly payments ----\n");
+			
+			resOut.write(strBasedOn);
+			resOut.write(strMonthlyPayments);
+			
+			HttpSession session = request.getSession(true);
+			session.setAttribute("strApplicationName", strApplicationName);
+			session.setAttribute("strApplicantName", strApplicantName);
+			session.setAttribute("strPrincipal", strPrincipal);
+			session.setAttribute("strPeriod", strPeriod);
+			session.setAttribute("strInterest", strInterest);
+			
+		// if use did not enter all params (or partially)
+		} else {
+			resOut.write("---- Info from context object ----\n");
+			
+			resOut.write(strApplicationName);
+			resOut.write(strContextPath);
+			resOut.write(strRealPath);
+			resOut.write(strApplicantName);
+			
+			HttpSession session = request.getSession();
+			
+			if (session.getAttribute("strApplicationName") != null) {
+				resOut.write("---- Session info ----\n");
+				
+				resOut.write((String) session.getAttribute("strApplicationName"));
+				resOut.write((String) session.getAttribute("strApplicantName"));
+				resOut.write((String) session.getAttribute("strPrincipal") + "\n");
+				resOut.write((String) session.getAttribute("strPeriod") + "\n");
+				resOut.write((String) session.getAttribute("strInterest") + "\n");
+				
+			}
+			
+			resOut.write("---- Monthly payments ----\n");
+			
+			resOut.write(strBasedOn);
+			resOut.write(strMonthlyPayments);
+		}
 		
-		ServletContext context = this.getServletContext();
-		
-		String applicantName = context.getInitParameter("applicantName");
-		String applicationName = context.getInitParameter("applicationName");
-		
-		String strApplicationName = "Application Name=" + applicationName + "\n";
-		String strContextPath = "Context Path=" + context.getContextPath() + "\n";
-		String strRealPath = "Real Path of Osap\nservlet=" + context.getRealPath("Osap") + "\n";
-		String strApplicantName = "Applicant Name=" + applicantName + "\n";
-		
-		resOut.write(strApplicationName);
-		resOut.write(strContextPath);
-		resOut.write(strRealPath);
-		resOut.write(strApplicantName);
-		
-		resOut.write("---- Monthly payments ----\n");
-		
-		Double principal = Double.parseDouble(context.getInitParameter("principal"));
-		Double period = Double.parseDouble(context.getInitParameter("period"));
-		Double interest = Double.parseDouble(context.getInitParameter("interest")) / 100;
-		
-		String rawPrincipal = request.getParameter("principal");
-		String rawPeriod = request.getParameter("period");
-		String rawInterest = request.getParameter("interest");
-		
-		if (rawPrincipal != null) {principal = Double.parseDouble(rawPrincipal);}
-		if (rawPeriod != null) {period = Double.parseDouble(rawPeriod);}
-		if (rawInterest != null) {interest = Double.parseDouble(rawInterest);}
-		
-		Double monthlyPayments = ((interest/12.0)*principal)/(1 - Math.pow((1 + (interest/12.0)), -period));
-		
-		String strPrincipal = String.format("Principal=%.01f", principal);
-		String strPeriod = String.format("Period=%.01f", period);
-		String strInterest = String.format("Interest=%.01f", interest);
-		
-		String strBasedOn = "Based on " + strPrincipal + " " + strPeriod + " " + strInterest + "\n";
-		String strMonthlyPayments = "Monthly payments: " + String.format("%.01f", monthlyPayments) + "\n";
-		
-		resOut.write(strBasedOn);
-		resOut.write(strMonthlyPayments);
 		
 		System.out.println("Hello, Got a GET request from Osap!");
 		
@@ -170,7 +211,40 @@ public class Osap extends HttpServlet {
 		String strRequestURI = "Request URI: " + requestURI + "\n";
 		String strRequestServletPath = "Reuqest Servlet Path: " + requestServletPath + "\n";
 		
+		String rawPrincipal = request.getParameter("principal");
+		String rawPeriod = request.getParameter("period");
+		String rawInterest = request.getParameter("interest");
 		
+		//--------------------------------------------//
+		
+		ServletContext context = this.getServletContext();
+		
+		String applicantName = context.getInitParameter("applicantName");
+		String applicationName = context.getInitParameter("applicationName");
+		
+		String strApplicationName = "Application Name=" + applicationName + "\n";
+		String strContextPath = "Context Path=" + context.getContextPath() + "\n";
+		String strRealPath = "Real Path of Osap\nservlet=" + context.getRealPath("Osap") + "\n";
+		String strApplicantName = "Applicant Name=" + applicantName + "\n";
+		
+		Double principal = Double.parseDouble(context.getInitParameter("principal"));
+		Double period = Double.parseDouble(context.getInitParameter("period"));
+		Double interest = Double.parseDouble(context.getInitParameter("interest"));
+		
+		if (rawPrincipal != null) {principal = Double.parseDouble(rawPrincipal);}
+		if (rawPeriod != null) {period = Double.parseDouble(rawPeriod);}
+		if (rawInterest != null) {interest = Double.parseDouble(rawInterest) / 100;}
+		
+		Double monthlyPayments = ((interest/12.0)*principal)/(1 - Math.pow((1 + (interest/12.0)), -period));
+		
+		String strPrincipal = String.format("Principal=%.01f", principal);
+		String strPeriod = String.format("Period=%.01f", period);
+		String strInterest = String.format("Interest=%.01f", interest);
+		
+		String strBasedOn = "Based on " + strPrincipal + " " + strPeriod + " " + strInterest + "\n";
+		String strMonthlyPayments = "Monthly payments: " + String.format("%.01f", monthlyPayments) + "\n";
+		
+		// ------------------------------------//
 		response.setContentType("text/plain");
 		Writer resOut = response.getWriter();
 		resOut.write(helloWorld);
@@ -186,48 +260,33 @@ public class Osap extends HttpServlet {
 		resOut.write(strRequestURI);
 		resOut.write(strRequestServletPath);
 		
-		resOut.write("---- Application info ----\n");
+		// if user entered all the params
+		if (rawPrincipal != null && rawPeriod != null && rawInterest != null) {
+			resOut.write("---- Info from context object ----\n");
+			
+			resOut.write(strApplicationName);
+			resOut.write(strContextPath);
+			resOut.write(strRealPath);
+			resOut.write(strApplicantName);
+			
+			resOut.write("---- Monthly payments ----\n");
+			
+			resOut.write(strBasedOn);
+			resOut.write(strMonthlyPayments);
+			
+		// if use did not enter all params (or partially)
+		} else {
+			resOut.write("---- Application info ----\n");
+			
+			resOut.write(strApplicationName);
+			resOut.write(strApplicantName);
+			
+			resOut.write("---- Monthly payments ----\n");
+			
+			resOut.write(strBasedOn);
+			resOut.write(strMonthlyPayments);
+		}
 		
-		ServletContext context = this.getServletContext();
-		
-		String applicantName = context.getInitParameter("applicantName");
-		String applicationName = context.getInitParameter("applicationName");
-		
-		String strApplicationName = "Application Name=" + applicationName + "\n";
-		String strContextPath = "Context Path=" + context.getContextPath() + "\n";
-		String strRealPath = "Real Path of Osap\nservlet=" + context.getRealPath("Osap") + "\n";
-		String strApplicantName = "Applicant Name=" + applicantName + "\n";
-		
-		resOut.write(strApplicationName);
-		resOut.write(strContextPath);
-		resOut.write(strRealPath);
-		resOut.write(strApplicantName);
-		
-		resOut.write("---- Monthly payments ----\n");
-		
-		Double principal = Double.parseDouble(context.getInitParameter("principal"));
-		Double period = Double.parseDouble(context.getInitParameter("period"));
-		Double interest = Double.parseDouble(context.getInitParameter("interest")) / 100;
-		
-		String rawPrincipal = request.getParameter("principal");
-		String rawPeriod = request.getParameter("period");
-		String rawInterest = request.getParameter("interest");
-		
-		if (rawPrincipal != null) {principal = Double.parseDouble(rawPrincipal);}
-		if (rawPeriod != null) {period = Double.parseDouble(rawPeriod);}
-		if (rawInterest != null) {interest = Double.parseDouble(rawInterest);}
-		
-		Double monthlyPayments = ((interest/12.0)*principal)/(1 - Math.pow((1 + (interest/12.0)), -period));
-		
-		String strPrincipal = String.format("Principal=%.01f", principal);
-		String strPeriod = String.format("Period=%.01f", period);
-		String strInterest = String.format("Interest=%.01f", interest);
-		
-		String strBasedOn = "Based on " + strPrincipal + " " + strPeriod + " " + strInterest + "\n";
-		String strMonthlyPayments = "Monthly payments: " + String.format("%.01f", monthlyPayments) + "\n";
-		
-		resOut.write(strBasedOn);
-		resOut.write(strMonthlyPayments);
 		
 		System.out.println("Hello, Got a GET request from Osap!");
 		
