@@ -7,5 +7,6 @@
 <title>Insert title here</title>
 </head>
 <body>
+<h1>Sorry, the page you requested were not found.</h1>
 </body>
 </html>

@@ -7,5 +7,6 @@
 <title>Insert title here</title>
 </head>
 <body>
+<h1>Sorry, an exception is raised.</h1>
 </body>
 </html>
