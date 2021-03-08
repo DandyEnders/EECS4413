@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+	<jsp:directive.page contentType="text/html; charset=UTF-8"
+		pageEncoding="UTF-8" session="true" />
+	<jsp:output doctype-root-element="html"
+		doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
+		doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+		omit-xml-declaration="true" />
+	<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>JavaScript Sample</title>
+<script type="text/javascript" src="res/myJS.js">;</script>
+</head>
+<body>
+	<form action="Hello" onsubmit="return validateForm();" method="get">
+		<div>
+			<label for='name'>Your Name</label> <input type='text' name='name'
+				id='name' />
+		</div>
+		<div>
+			<button type='submit' name='submit' value='true'>Hi-Sync</button>
+		</div>	
+	</form>
+
+	<div>
+		<input type='submit' name='ajaxSubmit' value='Hi-Ajax'
+			onclick="helloAjax('Hello')" />
+		<p id="ajaxTarget"> </p>
+	</div>
+	<div>
+		<button type='button' name='fetchSubmit' value='Hi-Fetch'
+			onclick="helloFetch('Hello')" >Hi-Fetch</button>
+		<p id="fetchTarget"> </p>
+	</div>
+
+</body>
+	</html>
+</jsp:root>

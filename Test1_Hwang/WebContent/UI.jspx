@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:f="http://java.sun.com/jsp/jstl/fmt"
+	version="2.0">
+	<jsp:directive.page contentType="text/html; charset=ISO-8859-1" 
+		pageEncoding="ISO-8859-1" session="true"/>
+	<jsp:output doctype-root-element="html"
+		doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
+		doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+		omit-xml-declaration="true" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Student Loan Application Form</title>
+<link rel="StyleSheet"
+href="${pageContext.request.contextPath}/res/mc.css" type="text/css"
+title="cse4413" media="screen, print" />
+</head>
+<body>
+<header>Student Loan Application</header>
+
+<nav>
+<a href="./home/">Home</a> |
+<a href="./about/">About</a>
+</nav>
+<section>
+<form action="Osap" method="POST" class="osapForm">
+<fieldset>
+	<legend>${UILegnedName}</legend>
+	<table>
+		<tr>
+			<td class="error">${errormsg}</td>
+		</tr>
+		
+		<tr>
+			<td><label for="principal">Principal</label></td>
+			<td rowspan="2"><input type="number" id="principal" value="${principal}" name="principal" ></input><br></br></td>
+		</tr>
+		<tr>
+			<td><small>(total loan amount after studies)</small></td>
+		</tr>
+		<tr></tr>
+		
+		<tr>
+			<td><label for="annualInterestRate">Annual Interest Rate</label></td>
+			<td rowspan="2"><input id="annualInterestRate" value="${annualInterestRate}" name="annualInterestRate" type="number"></input><br></br></td>
+		</tr>
+		<tr>
+		</tr>
+		<tr></tr>
+		
+		<tr>
+			<td><label for="paymentPeriod">Payment Period</label></td>
+			<td rowspan="2"><input id="paymentPeriod" value="${paymentPeriod}" name="paymentPeriod" type="number"></input><br></br></td>
+		</tr>
+		<tr>
+			<td><small>(total number of months)</small></td>
+		</tr>
+		<tr></tr>
+		
+		
+		
+		<tr>
+			<td><label for="grace">Grace Period</label></td>
+			<c:choose>
+				<c:when test="${not empty grace}">
+					<td rowspan="2"><input id="grace" checked="${grace}" name="grace" type="checkbox"></input><br></br></td>
+				</c:when>
+				<c:otherwise>
+					<td rowspan="2"><input id="grace" name="grace" type="checkbox"></input><br></br></td>
+				</c:otherwise>
+			</c:choose>
+			
+		</tr>
+		<tr>
+			<td><small>(Take advantage of 6 month grace period and include grace period interest with your loan balance)</small></td>
+		</tr>
+		<tr></tr>
+		
+		<tr>
+			<td></td>
+			<td rowspan="2"><button id="submit" name="calculate" value="true">Submit</button><br></br></td>
+		</tr>
+		<tr>
+		</tr>
+		<tr></tr>
+	</table>
+</fieldset>
+</form>
+</section>
+
+
+
+
+</body>
+</html>
+</jsp:root>
